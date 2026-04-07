@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Datos Físicos — Club Linares Vóleibol</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2128;
+    --border: #30363d;
+    --border2: #21262d;
+    --accent: #f0b429;
+    --accent2: #e09200;
+    --text: #e6edf3;
+    --muted: #7d8590;
+    --danger: #f85149;
+    --success: #3fb950;
+    --radius: 6px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  header {
+    width: 100%;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 56px;
+  }
+
+  .logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .logo span { color: var(--text); font-weight: 400; }
+
+  .main {
+    width: 100%;
+    max-width: 680px;
+    padding: 32px 20px 60px;
+  }
+
+  /* STEP RUT */
+  .step { display: none; }
+  .step.active { display: block; }
+
+  .search-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 32px;
+    margin-top: 16px;
+  }
+
+  .search-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  .search-sub {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .rut-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .rut-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    padding: 12px 16px;
+    text-transform: uppercase;
+    transition: border-color 0.15s;
+  }
+
+  .rut-input:focus { outline: none; border-color: var(--accent); }
+  .rut-input::placeholder { color: var(--border); letter-spacing: 2px; }
+
+  .btn {
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    color: #000;
+    cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 0 24px;
+    text-transform: uppercase;
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .btn:hover { background: var(--accent2); }
+  .btn:active { transform: scale(0.97); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 8px 18px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .btn-ghost:hover { border-color: var(--accent); background: rgba(240,180,41,0.06); }
+
+  .btn-save {
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    color: #000;
+    cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 10px 28px;
+    text-transform: uppercase;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn-save:hover { background: var(--accent2); }
+  .btn-save:active { transform: scale(0.97); }
+  .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .msg {
+    margin-top: 12px;
+    font-size: 13px;
+    min-height: 18px;
+    color: var(--muted);
+  }
+  .msg.error { color: var(--danger); }
+  .msg.ok { color: var(--success); }
+
+  /* STEP DATOS */
+  .jugador-header {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .jugador-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    line-height: 1.1;
+  }
+
+  .jugador-rut {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+
+  .badges { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; padding-top: 4px; }
+
+  .badge {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+  .badge-ok { background: rgba(63,185,80,0.15); color: var(--success); border: 1px solid rgba(63,185,80,0.3); }
+  .badge-warn { background: rgba(248,81,73,0.15); color: var(--danger); border: 1px solid rgba(248,81,73,0.3); }
+
+  .section-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--border2);
+    padding-bottom: 6px;
+  }
+
+  .fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 480px) {
+    .fields-grid { grid-template-columns: 1fr; }
+    .rut-row { flex-direction: column; }
+    .btn { padding: 12px; }
+  }
+
+  .field-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    transition: border-color 0.15s;
+  }
+
+  .field-item.empty { border-color: rgba(248,81,73,0.4); }
+  .field-item:focus-within { border-color: var(--accent); }
+
+  .field-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .field-current {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .field-current.empty-val {
+    font-size: 12px;
+    color: var(--danger);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .field-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 14px;
+    padding: 5px 8px;
+    transition: border-color 0.15s;
+  }
+  .field-input:focus { outline: none; border-color: var(--accent); }
+  .field-input::placeholder { color: var(--border); }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.65s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border2);
+    margin: 20px 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Club Linares <span>Vóleibol</span></div>
+</header>
+
+<div class="main">
+
+  <!-- PASO 1: Buscar por RUT -->
+  <div class="step active" id="step-rut">
+    <div class="search-box">
+      <div class="search-title">Datos físicos</div>
+      <div class="search-sub">Ingresa el RUT del jugador para ver y completar su ficha.</div>
+      <div class="rut-row">
+        <input class="rut-input" id="rut-input" placeholder="12.345.678-9" maxlength="12" />
+        <button class="btn" id="btn-buscar" onclick="buscarJugador()">Buscar</button>
+      </div>
+      <div class="msg" id="rut-msg"></div>
+    </div>
+  </div>
+
+  <!-- PASO 2: Ver y editar datos -->
+  <div class="step" id="step-datos">
+    <div class="jugador-header" id="jugador-header"></div>
+    <div class="section-label">Medidas antropométricas</div>
+    <div class="fields-grid" id="grid-antropo"></div>
+    <div class="section-label">Saltos</div>
+    <div class="fields-grid" id="grid-saltos"></div>
+    <div class="section-label">Velocidad</div>
+    <div class="fields-grid" id="grid-veloc"></div>
+    <div class="section-label">Fuerza prensil</div>
+    <div class="fields-grid" id="grid-fuerza"></div>
+    <hr class="divider">
+    <div class="actions">
+      <button class="btn-save" id="btn-guardar" onclick="guardarDatos()">Guardar en Airtable</button>
+      <button class="btn-ghost" onclick="volver()">Buscar otro jugador</button>
+    </div>
+    <div class="msg" id="save-msg"></div>
+  </div>
+
+</div>
+
+<script>
+const BASE_ID = 'appCfK4VOlIbFu14K';
+const TABLE_ID = 'tbl999aWPRz18BJWL';
+const AT_TOKEN = 'patTnNBaJvUOzpmJJ.0dc31099e544fb2dff036c1bc2daff4bf2452d2b430cc3dc76fd1e147adcd982';
+const AT_URL = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`;
+
+const SECCIONES = {
+  antropo: [
+    { id: 'fld9aEbivzCxkQvJu', label: 'Talla (cm)', hint: 'ej: 175.5' },
+    { id: 'fld0v7RUqZBeVJww0', label: 'Peso (kg)', hint: 'ej: 68.5' },
+    { id: 'fldDmWxE3oYr31m1d', label: 'Envergadura (cm)', hint: 'ej: 182.0' },
+    { id: 'fldqhJ36RP1bhrJch', label: 'Talla sentado (cm)', hint: 'ej: 92.0' },
+  ],
+  saltos: [
+    { id: 'fldU0wfR5LluYQobD', label: 'SLPJ Int.1 (cm)', hint: 'ej: 185' },
+    { id: 'fldEmmgkeJM1v12C9', label: 'SJ Int.1 (cm)', hint: 'ej: 38.5' },
+    { id: 'fldLuQB6ZM2f1mC75', label: 'CMJ Int.1 (cm)', hint: 'ej: 42.0' },
+    { id: 'fld09AyRBwNp5fEGC', label: 'Abalakov Int.1 (cm)', hint: 'ej: 52.0' },
+  ],
+  veloc: [
+    { id: 'fldXTsumopAkNwdrY', label: 'Velocidad 5m Int.1 (seg)', hint: 'ej: 1.12' },
+    { id: 'fldbJT1cLG0Y2lilN', label: 'Velocidad 10m Int.1 (seg)', hint: 'ej: 1.85' },
+  ],
+  fuerza: [
+    { id: 'fldiONfFv2zL78zmC', label: 'Hand Grip Derecho Int.1 (kg)', hint: 'ej: 38.5' },
+    { id: 'fldW650bKK7ErC27i', label: 'Hand Grip Izquierdo Int.1 (kg)', hint: 'ej: 34.0' },
+  ]
+};
+
+const TODOS_CAMPOS = [...SECCIONES.antropo, ...SECCIONES.saltos, ...SECCIONES.veloc, ...SECCIONES.fuerza];
+
+let recordActual = null;
+
+// Formateo RUT
+function formatRut(val) {
+  let v = val.replace(/[^0-9kK]/g, '').toUpperCase();
+  if (v.length > 9) v = v.slice(0, 9);
+  if (v.length > 1) {
+    let dv = v.slice(-1);
+    let nums = v.slice(0, -1);
+    let fmt = '';
+    while (nums.length > 3) { fmt = '.' + nums.slice(-3) + fmt; nums = nums.slice(0, -3); }
+    v = nums + fmt + '-' + dv;
+  }
+  return v;
+}
+
+document.getElementById('rut-input').addEventListener('input', function() {
+  this.value = formatRut(this.value);
+});
+
+document.getElementById('rut-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') buscarJugador();
+});
+
+function limpiarRut(rut) {
+  return rut.replace(/[^0-9kK]/g, '').toUpperCase();
+}
+
+async function buscarJugador() {
+  const rut = document.getElementById('rut-input').value.trim();
+  if (!rut) return;
+  const msg = document.getElementById('rut-msg');
+  msg.className = 'msg';
+  msg.innerHTML = '<span class="spinner"></span>Buscando jugador...';
+  document.getElementById('btn-buscar').disabled = true;
+
+  try {
+    // Traer todos los registros y buscar por RUT ignorando formato
+    let allRecords = [];
+    let offset = null;
+    do {
+      const url = new URL(AT_URL);
+      url.searchParams.set('pageSize', '100');
+      if (offset) url.searchParams.set('offset', offset);
+      const res = await fetch(url.toString(), {
+        headers: { 'Authorization': 'Bearer ' + AT_TOKEN }
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error.message || 'Error Airtable');
+      allRecords = allRecords.concat(data.records || []);
+      offset = data.offset;
+    } while (offset);
+
+    const rutBuscar = limpiarRut(rut);
+    const found = allRecords.find(r => {
+      const rutCampo = (r.fields['fldle105I52050Cpn'] || '').trim();
+      return limpiarRut(rutCampo) === rutBuscar;
+    });
+
+    if (!found) {
+      msg.className = 'msg error';
+      msg.textContent = 'No se encontró ningún jugador con ese RUT.';
+      document.getElementById('btn-buscar').disabled = false;
+      return;
+    }
+
+    recordActual = { recordId: found.id, record: found.fields };
+    mostrarDatos(found.fields, found.id);
+    msg.className = 'msg';
+    msg.textContent = '';
+    document.getElementById('step-rut').classList.remove('active');
+    document.getElementById('step-datos').classList.add('active');
+  } catch(e) {
+    msg.className = 'msg error';
+    msg.textContent = 'Error al buscar: ' + e.message;
+    document.getElementById('btn-buscar').disabled = false;
+  }
+}
+
+function renderGrilla(campos, record, containerId) {
+  const cont = document.getElementById(containerId);
+  cont.innerHTML = '';
+  campos.forEach(c => {
+    const val = record[c.id] ? String(record[c.id]).trim() : '';
+    const item = document.createElement('div');
+    item.className = 'field-item' + (val ? '' : ' empty');
+    item.innerHTML = `
+      <div class="field-label">${c.label}</div>
+      <div class="field-current ${val ? '' : 'empty-val'}">${val || 'Sin dato'}</div>
+      <input class="field-input" id="inp-${c.id}" value="${val}" placeholder="${c.hint}" />
+    `;
+    cont.appendChild(item);
+
+    // Al escribir, actualiza la vista actual y quita clase empty
+    const inp = item.querySelector('input');
+    inp.addEventListener('input', function() {
+      const curr = item.querySelector('.field-current');
+      if (this.value.trim()) {
+        curr.textContent = this.value.trim();
+        curr.className = 'field-current';
+        item.classList.remove('empty');
+      } else {
+        curr.textContent = 'Sin dato';
+        curr.className = 'field-current empty-val';
+        item.classList.add('empty');
+      }
+    });
+  });
+}
+
+function mostrarDatos(record, recId) {
+  const nombres = (record['fldnkQCbM2aBMq6gg'] || '').trim();
+  const apellidos = (record['fldDYRgmSrHI2MUHH'] || '').trim();
+  const rut = (record['fldle105I52050Cpn'] || '').trim();
+  const vacios = TODOS_CAMPOS.filter(c => !record[c.id] || String(record[c.id]).trim() === '').length;
+  const llenos = TODOS_CAMPOS.length - vacios;
+
+  document.getElementById('jugador-header').innerHTML = `
+    <div>
+      <div class="jugador-name">${apellidos}<br>${nombres}</div>
+      <div class="jugador-rut">RUT ${rut}</div>
+    </div>
+    <div class="badges">
+      <span class="badge badge-ok">${llenos} con dato</span>
+      <span class="badge badge-warn">${vacios} sin dato</span>
+    </div>
+  `;
+
+  renderGrilla(SECCIONES.antropo, record, 'grid-antropo');
+  renderGrilla(SECCIONES.saltos, record, 'grid-saltos');
+  renderGrilla(SECCIONES.veloc, record, 'grid-veloc');
+  renderGrilla(SECCIONES.fuerza, record, 'grid-fuerza');
+
+  document.getElementById('save-msg').textContent = '';
+  document.getElementById('btn-guardar').disabled = false;
+}
+
+async function guardarDatos() {
+  const btn = document.getElementById('btn-guardar');
+  const msg = document.getElementById('save-msg');
+  msg.className = 'msg';
+  msg.innerHTML = '<span class="spinner"></span>Guardando en Airtable...';
+  btn.disabled = true;
+
+  const fields = {};
+  TODOS_CAMPOS.forEach(c => {
+    const inp = document.getElementById('inp-' + c.id);
+    if (inp && inp.value.trim()) fields[c.id] = inp.value.trim();
+  });
+
+  try {
+    const res = await fetch(`${AT_URL}/${recordActual.recordId}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': 'Bearer ' + AT_TOKEN,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ fields })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message || 'Error Airtable');
+
+    msg.className = 'msg ok';
+    msg.textContent = 'Guardado correctamente en Airtable.';
+  } catch(e) {
+    msg.className = 'msg error';
+    msg.textContent = 'Error: ' + e.message;
+  }
+  btn.disabled = false;
+}
+
+function volver() {
+  recordActual = null;
+  document.getElementById('rut-input').value = '';
+  document.getElementById('rut-msg').textContent = '';
+  document.getElementById('btn-buscar').disabled = false;
+  document.getElementById('step-datos').classList.remove('active');
+  document.getElementById('step-rut').classList.add('active');
+}
+</script>
+</body>
+</html>
